@@ -105,7 +105,8 @@ class TextEditor(Widget):
 
     def import_btn_press(instance):
         print('import')
-        PopupInput.setup()
+        popup = PopupInput()
+        popup.setup()
 
     def save_btn_press(instance):
         print('Save')

@@ -86,6 +86,10 @@ class FileSystem:
         encrypted_file.write(encrypted_contents)
         encrypted_file.close()
 
+    def createFile(self, filepath, organisation, password):
+        # make an empty file
+        self.updateFile(filepath, '', organisation, password)
+
 
 if __name__ == '__main__':
     f = FileSystem()
@@ -94,3 +98,4 @@ if __name__ == '__main__':
     f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
     'test1234')
     print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
+    f.createFile('test1.py.enc', 'Student Hack', 'test1234')

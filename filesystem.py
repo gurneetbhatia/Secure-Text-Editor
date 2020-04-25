@@ -5,8 +5,8 @@ from cryptography.hazmat.backends import default_backend
 allows the user to create new files, read files and edit/save files
 '''
 class FileSystem:
-    def __init__(self):
-        pass
+    def __init__(self, localkeyspath='localkeys'):
+        this.local_keys_path = localkeyspath
 
     def isNewOrganisation(self, organisation):
         # check if organisation.key exists localkeys directory

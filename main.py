@@ -23,8 +23,6 @@ from kivy.base import runTouchApp
 
 from filesystem import FileSystem
 
-<<<<<<< HEAD
-=======
 
 
 class NavBarController(Widget):
@@ -40,7 +38,6 @@ class NavBarController(Widget):
         file_btns = [createFile_btn, loadFile_btn, saveFile_btn]
         fileDropDownSetup = DropDownController()
         file_btn = fileDropDownSetup.setup(file_btns, "file")
->>>>>>> 644f3964d41279eb20c744009fa6a4ea17d2b2fa
 
 class NavBarController:
     def setup(self, layout):
@@ -48,7 +45,6 @@ class NavBarController:
         save_btn = Button(text='Run', font_size=14)
         run_btn = Button(text='Help', font_size=14)
 
-<<<<<<< HEAD
         self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
         self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
         self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
@@ -64,19 +60,15 @@ class NavBarController:
         btns = [import_btn, save_btn, run_btn]
         self.file_btn.size_hint_y = 1
         layout.add_widget(self.file_btn)
-=======
         btns = [import_btn, save_btn, run_btn]
->>>>>>> 644f3964d41279eb20c744009fa6a4ea17d2b2fa
 
         layout.add_widget(file_btn)
         for btn in btns:
             layout.add_widget(btn)
 
-<<<<<<< HEAD
-=======
 
 
->>>>>>> 644f3964d41279eb20c744009fa6a4ea17d2b2fa
+
         btns[0].bind(on_press=TextEditor.import_btn_press)
         btns[1].bind(on_press=TextEditor.save_btn_press)
         btns[2].bind(on_press=TextEditor.run_btn_press)
@@ -88,17 +80,15 @@ class DropDownController(Widget):
         for btn in btns:
             btn.bind(on_release=lambda btn: dropdown.select(btn.text))
             dropdown.add_widget(btn)
-<<<<<<< HEAD
         self.mainbutton = Button(text=title, size_hint=(None, None), height = 14)
         self.mainbutton.bind(on_release=dropdown.open)
         return self.mainbutton
-=======
+
         mainbutton = Button(text='File', size_hint=(None, None))
         print(mainbutton.text)
         mainbutton.bind(on_release=dropdown.open)
         dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         return mainbutton
->>>>>>> 644f3964d41279eb20c744009fa6a4ea17d2b2fa
 
 class TextEditor(Widget):
     app_container = ObjectProperty(None)
@@ -153,12 +143,9 @@ class TextEditor(Widget):
         print('import')
         popup = PopupInput()
         popup.setup()
-<<<<<<< HEAD
-=======
 
     def popupdismiss(instance):
         print('here')
->>>>>>> 644f3964d41279eb20c744009fa6a4ea17d2b2fa
 
     def save_btn_press(instance):
         print('Save')
@@ -256,11 +243,6 @@ class PopupInput(Widget):
                 content=layout, size_hint=(None, None), size=(400, 250))
             popup.open()
             button.bind(on_press=popup.dismiss)
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 644f3964d41279eb20c744009fa6a4ea17d2b2fa
 
 class MainApp(App):
     def build(self):

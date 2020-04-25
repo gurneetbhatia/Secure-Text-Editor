@@ -14,6 +14,9 @@ from kivy.uix.codeinput import CodeInput
 from filesystem import FileSystem
 from kivy.uix.popup import Popup
 
+from kivy.uix.dropdown import DropDown
+from kivy.base import runTouchApp
+
 
 class NavBarController(Widget):
     def setup(self, layout):
@@ -34,6 +37,17 @@ class NavBarController(Widget):
         btns[2].bind(on_press=TextEditor.save_btn_press)
         btns[3].bind(on_press=TextEditor.run_btn_press)
 
+class DropDownController(Widget):
+    def setup(self):
+        dropdown = DropDown()
+        for index in range(10):
+            btn = Button(text='Value %d' % index, size_hint_y=None, height=44)
+            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
+            dropdown.add_widget(btn)
+        mainbutton = Button(text='Hello', size_hint=(None, None))
+        mainbutton.bind(on_release=dropdown.open)
+        dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
+        return dropdown
 
 class TextEditor(Widget):
     app_container = ObjectProperty(None)
@@ -61,7 +75,12 @@ class TextEditor(Widget):
 
         codeinput = CodeInput(lexer=CythonLexer())
         codeinput.bind(text=TextEditor.on_text)
+
+        fileDropDown = DropDownController()
+        fileDropDownBtn = fileDropDown.setup()
+
         self.text_container.add_widget(codeinput)
+        self.text_container.add_widget(fileDropDownBtn)
 
     def on_window_resize(self, window, width, height):
         print("width", width)
@@ -100,6 +119,20 @@ class TextEditor(Widget):
         print('Run')
 
 class PopupInput(Widget):
+    org = ''
+    pas = ''
+
+    def set_org(instance, value):
+        PopupInput.org = value
+
+    def get_org(self):
+        return org
+
+    def set_pas(instance, value):
+        PopupInput.pas = value
+
+    def get_pas(self):
+        return pas
 
     def setup(self):
         layout = BoxLayout()
@@ -107,12 +140,17 @@ class PopupInput(Widget):
         inputOrg = TextInput()
         labelPas = Label(text='Password')
         inputPas = TextInput()
+        button = Button(text='Confirm')
         layout.add_widget(labelOrg)
         layout.add_widget(inputOrg)
         layout.add_widget(labelPas)
         layout.add_widget(inputPas)
+        layout.add_widget(button)
+        inputOrg.bind(text=set_org)
+        inputPas.bind(text=set_pas)
         popup = Popup(title='Enter credentials',
             content=layout, size_hint=(None, None), size=(400, 400))
+        button.bind(on_press=popup.dismiss)
 
 class MainApp(App):
     def build(self):

@@ -7,6 +7,8 @@ from kivy.properties import (
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
+from pygments.lexers import CythonLexer
+from kivy.uix.codeinput import CodeInput
 
 class NavBarController(Widget):
     def setup(self, layout):
@@ -47,15 +49,20 @@ class TextEditor(Widget):
     app_container = ObjectProperty(None)
     nav_container = ObjectProperty(None)
     text_container = ObjectProperty(None)
-    
+
     def setup(self):
         width = 500
         height = 500
         Window.size = (width, height)
         Window.bind(on_resize=self.on_window_resize)
         Config.set('graphics', 'resizable', '0')
+
         navBar = NavBarController()
         navBarBtnsContainer = navBar.setup(self.nav_container)
+
+        codeinput = CodeInput(lexer=CythonLexer())
+        # codeinput.bind(text=label.setter("text"))
+        self.text_container.add_widget(codeinput)
 
     def on_window_resize(self, window, width, height):
         print("width", width)

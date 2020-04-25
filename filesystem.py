@@ -91,9 +91,10 @@ class FileSystem:
         # make an empty file
         self.updateFile(filepath, '', organisation, password)
 
-    def run(self, filepath, organisation, password):
+    def run(self, filepath, organisation, password, args=[]):
         file_ext = filepath.split('.')[-2]
         decrypted_contents = self.readFile(filepath, organisation, password)
+
         if file_ext == 'py':
             exec(decrypted_contents)
         elif file_ext == 'java':
@@ -103,10 +104,16 @@ class FileSystem:
             file = open(filename, 'w+')
             file.write(decrypted_contents)
             file.close()
-            os.system('javac '+filename)
+            prefix = ""
+            os.system('javac '+''.join(args)+filename)
             os.system('java '+appname)
             os.remove(filename)
             os.remove(appname+'.class')
+        elif file_ext == '.cpp':
+            if '-o' in args:
+                index = args.index('-o')
+                args = args[:index] + args[index+2:]
+            os.system('g++ '+''.join(args)+filename)
 
 
 

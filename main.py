@@ -33,7 +33,8 @@ class NavBarController(Widget):
 
 
     def org_btn_press(instance):
-        print('Organisation')
+        print('File')
+
 
     def import_btn_press(instance):
         print('import')
@@ -50,7 +51,11 @@ class TextEditor(Widget):
     nav_container = ObjectProperty(None)
     text_container = ObjectProperty(None)
 
+    def on_text(self, instance, value):
+        self.text = value
+
     def setup(self):
+        self.text = ""
         width = 500
         height = 500
         Window.size = (width, height)
@@ -61,13 +66,16 @@ class TextEditor(Widget):
         navBarBtnsContainer = navBar.setup(self.nav_container)
 
         codeinput = CodeInput(lexer=CythonLexer())
-        # codeinput.bind(text=label.setter("text"))
+        codeinput.bind(text=self.on_text)
         self.text_container.add_widget(codeinput)
 
     def on_window_resize(self, window, width, height):
         print("width", width)
         self.app_container.size = width, height
+        self.nav_container.size_hint = 500/width * 0.8, 500/height * 0.05
     #navBar = ObjectProperty(None)
+
+
 
 class MainApp(App):
     def build(self):

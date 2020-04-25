@@ -73,9 +73,21 @@ class FileSystem:
         decrypted_contents = enc.decrypt_string(encrypted_contents)
         return decrypted_contents
 
+    def updateFile(self, filepath, contents, organisation):
+        # this function can be used when the user chooses to save their work
+        # get the key for the provided organisation
+        key = self.getOrganisationKey(organisation)
+        enc = Encrypt(key)
+
+        encrypted_file = open(filepath, 'wb')
+        encrypted_contents = enc.encrypt_string(contents)
+        encrypted_file.write(encrypted_contents)
+        encrypted_file.close()
 
 
 if __name__ == '__main__':
     f = FileSystem()
-    #f.importFile('test.py', 'Student Hack', 'test.py.enc')
+    f.importFile('test.py', 'Student Hack', 'test.py.enc')
+    print(f.readFile('test.py.enc', 'Student Hack'))
+    f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack')
     print(f.readFile('test.py.enc', 'Student Hack'))

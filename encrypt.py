@@ -34,3 +34,5 @@ class Encrypt:
         label=None
         ))
         return msg.decode('utf-8')
+
+    #def run(self, filepath, organisation, password):

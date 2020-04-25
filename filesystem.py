@@ -90,6 +90,10 @@ class FileSystem:
         # make an empty file
         self.updateFile(filepath, '', organisation, password)
 
+    def run(self, filepath, organisation, password):
+        decrypted_contents = self.readFile(filepath, organisation, password)
+        exec(decrypted_contents)
+
 
 if __name__ == '__main__':
     f = FileSystem()
@@ -99,3 +103,4 @@ if __name__ == '__main__':
     'test1234')
     print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
     f.createFile('test1.py.enc', 'Student Hack', 'test1234')
+    f.run('test1.py.enc', 'Student Hack', 'test1234')

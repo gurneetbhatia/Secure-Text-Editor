@@ -91,8 +91,11 @@ class FileSystem:
         # make an empty file
         self.updateFile(filepath, '', organisation, password)
 
+    def getFileType(self, filepath):
+        return filepath.split('.')[-2]
+
     def run(self, filepath, organisation, password, args=[]):
-        file_ext = filepath.split('.')[-2]
+        file_ext = self.getFileType(filepath)
         decrypted_contents = self.readFile(filepath, organisation, password)
 
         if file_ext == 'py':

@@ -91,9 +91,10 @@ class FileSystem:
         # make an empty file
         self.updateFile(filepath, '', organisation, password)
 
-    def run(self, filepath, organisation, password):
+    def run(self, filepath, organisation, password, args=[]):
         file_ext = filepath.split('.')[-2]
         decrypted_contents = self.readFile(filepath, organisation, password)
+
         if file_ext == 'py':
             exec(decrypted_contents)
         elif file_ext == 'java':
@@ -103,10 +104,22 @@ class FileSystem:
             file = open(filename, 'w+')
             file.write(decrypted_contents)
             file.close()
-            os.system('javac '+filename)
+            os.system('javac '+''.join(args)+filename)
             os.system('java '+appname)
             os.remove(filename)
             os.remove(appname+'.class')
+        elif file_ext == 'cpp':
+            if '-o' in args:
+                index = args.index('-o')
+                args = args[:index] + args[index+2:]
+            filename = filepath[:-4]
+            file = open(filename, 'w+')
+            file.write(decrypted_contents)
+            file.close()
+            os.system('g++ '+''.join(args)+filename)
+            os.system('./a.out')
+            os.remove(filename)
+            os.remove('./a.out')
 
 
 
@@ -123,3 +136,7 @@ if __name__ == '__main__':
     #f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
     #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
     f.run('Test.java.enc', 'Student Hack', 'test1234')
+
+    #f.importFile('test.cpp', 'Student Hack', 'test1234', 'test.cpp.enc')
+    #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
+    f.run('test.cpp.enc', 'Student Hack', 'test1234')

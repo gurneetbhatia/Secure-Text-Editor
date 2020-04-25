@@ -1,6 +1,7 @@
 from encrypt import Encrypt
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
+import os
 '''
 allows the user to create new files, read files and edit/save files
 '''
@@ -91,8 +92,22 @@ class FileSystem:
         self.updateFile(filepath, '', organisation, password)
 
     def run(self, filepath, organisation, password):
+        file_ext = filepath.split('.')[-2]
         decrypted_contents = self.readFile(filepath, organisation, password)
-        exec(decrypted_contents)
+        if file_ext == 'py':
+            exec(decrypted_contents)
+        elif file_ext == 'java':
+            # create a temporary file
+            filename = filepath[:-4]
+            appname = filename[:-5]
+            file = open(filename, 'w+')
+            file.write(decrypted_contents)
+            file.close()
+            os.system('javac '+filename)
+            os.system('java '+appname)
+            os.remove(filename)
+            os.remove(appname+'.class')
+
 
 
 if __name__ == '__main__':
@@ -104,3 +119,7 @@ if __name__ == '__main__':
     print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
     f.createFile('test1.py.enc', 'Student Hack', 'test1234')
     f.run('test1.py.enc', 'Student Hack', 'test1234')
+
+    #f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
+    #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
+    f.run('Test.java.enc', 'Student Hack', 'test1234')

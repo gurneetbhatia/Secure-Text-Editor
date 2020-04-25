@@ -1,0 +1,41 @@
+#:kivy 1.11.1
+
+<NavBarController>:
+    posx: 0
+    posy: 0
+    sizex: 50
+    sizey: 50
+    canvas:
+        Rectangle:
+            pos: self.posx, self.posy
+            size: self.sizex, self.sizey
+
+<TextEditor>:
+    nav_bar_bk: nav_bar_bk_ui
+    org_btn: org_btn_ui
+    import_btn: import_btn_ui
+    save_btn: save_btn_ui
+    run_btn: run_btn_ui
+
+    NavBarController:
+        id: nav_bar_bk_ui
+
+    Button:
+        id: org_btn_ui
+        pos: 0, 0
+        text: 'Organisation'
+
+    Button:
+        id: import_btn_ui
+        pos: 50, 0
+        text: 'Import'
+
+    Button:
+        id: save_btn_ui
+        pos: 100, 0
+        text: 'Save'
+
+    Button:
+        id: run_btn_ui
+        pos: 150, 0
+        text: 'Run'

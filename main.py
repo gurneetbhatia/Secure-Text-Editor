@@ -22,20 +22,32 @@ from kivy.uix.dropdown import DropDown
 from kivy.base import runTouchApp
 
 from filesystem import FileSystem
+from kivy.uix.floatlayout import FloatLayout
+from kivy.factory import Factory
+from kivy.properties import ObjectProperty
+from kivy.uix.popup import Popup
+
+from filesystem import FileSystem
+import os
+
+import tkinter as tk
 
 
 
 class NavBarController(Widget):
     def setup(self, layout):
+
         createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
+        import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=44)
         loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
         saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
 
         createFile_btn.bind(on_press=TextEditor.create_btn_press)
+        import_btn.bind(on_press=TextEditor.import_file_btn_press)
         loadFile_btn.bind(on_press=TextEditor.load_btn_press)
         saveFile_btn.bind(on_press=TextEditor.save_btn_press)
 
-        file_btns = [createFile_btn, loadFile_btn, saveFile_btn]
+        file_btns = [createFile_btn, import_btn, loadFile_btn, saveFile_btn]
         fileDropDownSetup = DropDownController()
         file_btn = fileDropDownSetup.setup(file_btns, "file")
 
@@ -46,14 +58,16 @@ class NavBarController:
         run_btn = Button(text='Help', font_size=14)
 
         self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
+        self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=44)
         self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
         self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
 
         self.createFile_btn.bind(on_press=TextEditor.create_btn_press)
+        self.import_btn.bind(on_press=TextEditor.import_file_btn_press)
         self.loadFile_btn.bind(on_press=TextEditor.load_btn_press)
         self.saveFile_btn.bind(on_press=TextEditor.save_btn_press)
 
-        file_btns = [self.createFile_btn, self.loadFile_btn, self.saveFile_btn]
+        file_btns = [self.createFile_btn, self.import_btn, self.loadFile_btn, self.saveFile_btn]
         fileDropDownSetup = DropDownController()
         self.file_btn = fileDropDownSetup.setup(file_btns, "file")
 
@@ -62,7 +76,7 @@ class NavBarController:
         layout.add_widget(self.file_btn)
         btns = [import_btn, save_btn, run_btn]
 
-        layout.add_widget(file_btn)
+        #layout.add_widget(self.file_btn)
         for btn in btns:
             layout.add_widget(btn)
 
@@ -131,8 +145,15 @@ class TextEditor(Widget):
     # FILE DROPDOWN EVENTS
     def create_btn_press(instance):
         print("Create")
+
+    def import_file_btn_press(instance):
+        print('import file')
+        lsd = LoadSaveDialog()
+        lsd.show_load()
+
     def load_btn_press(instance):
         print("Load")
+
     def save_btn_press(instance):
         print("Save")
 
@@ -244,11 +265,85 @@ class PopupInput(Widget):
             popup.open()
             button.bind(on_press=popup.dismiss)
 
+class LoadDialog(FloatLayout):
+    load = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+
+class SaveDialog(FloatLayout):
+    save = ObjectProperty(None)
+    text_input = ObjectProperty(None)
+    cancel = ObjectProperty(None)
+
+
+class LoadSaveDialog(FloatLayout):
+    loadfile = ObjectProperty(None)
+    savefile = ObjectProperty(None)
+    #text_input = ObjectProperty(None)
+    showingLoad = False
+
+    def dismiss_popup(self):
+        self._popup.dismiss()
+
+    def show_load(self):
+        print('here')
+        content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Load file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def show_save(self):
+        content = SaveDialog(save=self.save, cancel=self.dismiss_popup)
+        self._popup = Popup(title="Save file", content=content,
+                            size_hint=(0.9, 0.9))
+        self._popup.open()
+
+    def load(self, path, filename):
+        string = ""
+        with open(os.path.join(path, filename[0])) as stream:
+            string= stream.read()
+
+        print(path, filename)
+        ext = filename[0].split('.')[-1]
+        fs = FileSystem()
+        # ask the user for organisation name and password
+        layout = BoxLayout(orientation='vertical')
+        labelOrg = Label(text='Organisation')
+        inputOrg = TextInput(multiline=False)
+        labelPas = Label(text='Password')
+        inputPas = TextInput(multiline=False)
+        button = Button(text='Confirm')
+        layout.add_widget(labelOrg)
+        layout.add_widget(inputOrg)
+        layout.add_widget(labelPas)
+        layout.add_widget(inputPas)
+        layout.add_widget(button)
+        inputOrg.bind(text=PopupInput.set_org)
+        inputPas.bind(text=PopupInput.set_pas)
+        popup = Popup(title='Enter credentials',
+            content=layout, size_hint=(None, None), size=(400, 250))
+        popup.open()
+        if ext != 'enc':
+            # the file needs to be encrypted
+            pass
+
+        self.dismiss_popup()
+
+    def save(self, path, filename):
+        with open(os.path.join(path, filename), 'w') as stream:
+            stream.write(self.text_input.text)
+
+        self.dismiss_popup()
+
 class MainApp(App):
     def build(self):
         app = TextEditor()
         app.setup()
         return app
+
+Factory.register('LoadSaveDialog', cls=LoadSaveDialog)
+Factory.register('LoadDialog', cls=LoadDialog)
+Factory.register('SaveDialog', cls=SaveDialog)
 
 if __name__ == '__main__':
     MainApp().run()

@@ -9,6 +9,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
 from pygments.lexers import CythonLexer
 from kivy.uix.codeinput import CodeInput
+from filesystem import FileSystem
 
 class NavBarController(Widget):
     def setup(self, layout):
@@ -24,49 +25,38 @@ class NavBarController(Widget):
         layout.add_widget(btns[2])
         layout.add_widget(btns[3])
 
-        btns[0].bind(on_press=NavBarController.org_btn_press)
-        btns[1].bind(on_press=NavBarController.import_btn_press)
-        btns[2].bind(on_press=NavBarController.save_btn_press)
-        btns[3].bind(on_press=NavBarController.run_btn_press)
-
-        numButtons = len(btns)
+        btns[0].bind(on_press=TextEditor.org_btn_press)
+        btns[1].bind(on_press=TextEditor.import_btn_press)
+        btns[2].bind(on_press=TextEditor.save_btn_press)
+        btns[3].bind(on_press=TextEditor.run_btn_press)
 
 
-    def org_btn_press(instance):
-        print('File')
-
-
-    def import_btn_press(instance):
-        print('import')
-
-    def save_btn_press(instance):
-        print('Save')
-
-    def run_btn_press(instance):
-        print('Run')
 
 
 class TextEditor(Widget):
     app_container = ObjectProperty(None)
     nav_container = ObjectProperty(None)
     text_container = ObjectProperty(None)
+    text = ""
 
-    def on_text(self, instance, value):
-        self.text = value
+    def on_text(instance, value):
+        TextEditor.text = value
+        print(value)
 
     def setup(self):
-        self.text = ""
         width = 500
         height = 500
         Window.size = (width, height)
         Window.bind(on_resize=self.on_window_resize)
         Config.set('graphics', 'resizable', '0')
 
+        Window.bind(on_keyboard=self.on_keyboard)
+
         navBar = NavBarController()
         navBarBtnsContainer = navBar.setup(self.nav_container)
 
         codeinput = CodeInput(lexer=CythonLexer())
-        codeinput.bind(text=self.on_text)
+        codeinput.bind(text=TextEditor.on_text)
         self.text_container.add_widget(codeinput)
 
     def on_window_resize(self, window, width, height):
@@ -74,6 +64,32 @@ class TextEditor(Widget):
         self.app_container.size = width, height
         self.nav_container.size_hint = 500/width * 0.8, 500/height * 0.05
     #navBar = ObjectProperty(None)
+
+    def org_btn_press(instance):
+        print('File')
+
+    def import_btn_press(instance):
+        print('import')
+
+    def save_btn_press(instance):
+        print('Save')
+        fs = FileSystem()
+        fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
+        print(TextEditor.text)
+
+    def save(self):
+        print('Save')
+        fs = FileSystem()
+        fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
+        print(TextEditor.text)
+
+    def on_keyboard(self, window, key, scancode, codepoint, modifier):
+        if modifier == ['ctrl'] and codepoint == 's':
+            print("Clicked")
+            self.save()
+
+    def run_btn_press(instance):
+        print('Run')
 
 
 

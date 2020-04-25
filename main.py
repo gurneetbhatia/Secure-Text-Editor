@@ -8,6 +8,8 @@ from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
 from pygments.lexers import CythonLexer
+from pygments.lexers import JavaLexer
+from pygments.lexers import CppLexer
 
 
 from kivy.uix.codeinput import CodeInput
@@ -25,9 +27,11 @@ class NavBarController(Widget):
         createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
         loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
         saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
+
         createFile_btn.bind(on_press=TextEditor.create_btn_press)
         loadFile_btn.bind(on_press=TextEditor.load_btn_press)
         saveFile_btn.bind(on_press=TextEditor.save_btn_press)
+
         file_btns = [createFile_btn, loadFile_btn, saveFile_btn]
         fileDropDownSetup = DropDownController()
         file_btn = fileDropDownSetup.setup(file_btns, "file")
@@ -36,23 +40,27 @@ class NavBarController(Widget):
         save_btn = Button(text='Run', font_size=14)
         run_btn = Button(text='Help', font_size=14)
 
-        btns = [file_btn, import_btn, save_btn, run_btn]
+        btns = [import_btn, save_btn, run_btn]
 
+        layout.add_widget(file_btn)
         for btn in btns:
             layout.add_widget(btn)
 
-        btns[0].bind(on_press=TextEditor.org_btn_press)
-        btns[1].bind(on_press=TextEditor.import_btn_press)
-        btns[2].bind(on_press=TextEditor.save_btn_press)
-        btns[3].bind(on_press=TextEditor.run_btn_press)
+
+
+        btns[0].bind(on_press=TextEditor.import_btn_press)
+        btns[1].bind(on_press=TextEditor.save_btn_press)
+        btns[2].bind(on_press=TextEditor.run_btn_press)
 
 class DropDownController(Widget):
     def setup(self, btns, title):
+        print("Done")
         dropdown = DropDown()
         for btn in btns:
             btn.bind(on_release=lambda btn: dropdown.select(btn.text))
             dropdown.add_widget(btn)
-        mainbutton = Button(text=title, size_hint=(None, None))
+        mainbutton = Button(text='File', size_hint=(None, None))
+        print(mainbutton.text)
         mainbutton.bind(on_release=dropdown.open)
         dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
         return mainbutton
@@ -135,6 +143,7 @@ class TextEditor(Widget):
 class PopupInput(Widget):
     org = ''
     pas = ''
+    popup = None
 
     def set_org(instance, value):
         PopupInput.org = value
@@ -148,12 +157,15 @@ class PopupInput(Widget):
     def get_pas(self):
         return pas
 
+    def confirm(self):
+        pass
+
     def setup(self):
         layout = BoxLayout(orientation='vertical')
         labelOrg = Label(text='Organisation')
-        inputOrg = TextInput(text='Enter Organisation', multiline=False)
+        inputOrg = TextInput(multiline=False)
         labelPas = Label(text='Password')
-        inputPas = TextInput(text='Enter Password', multiline=False)
+        inputPas = TextInput(multiline=False)
         button = Button(text='Confirm')
         layout.add_widget(labelOrg)
         layout.add_widget(inputOrg)
@@ -162,10 +174,15 @@ class PopupInput(Widget):
         layout.add_widget(button)
         inputOrg.bind(text=PopupInput.set_org)
         inputPas.bind(text=PopupInput.set_pas)
-        popup = Popup(title='Enter credentials',
-            content=layout, size_hint=(None, None), size=(400, 200))
-        popup.open()
-        button.bind(on_press=popup.dismiss)
+        PopupInput.popup = Popup(title='Enter credentials',
+            content=layout, size_hint=(None, None), size=(400, 250))
+        PopupInput.popup.open()
+        button.bind(on_press=self.confirm_clicked)
+
+    def confirm_clicked(self, x):
+        PopupInput.popup.dismiss()
+        print(PopupInput.org, PopupInput.pas)
+        return (PopupInput.org, PopupInput.pas)
 
 class MainApp(App):
     def build(self):

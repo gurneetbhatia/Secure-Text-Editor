@@ -22,6 +22,8 @@ from kivy.uix.dropdown import DropDown
 from kivy.base import runTouchApp
 
 
+
+
 class NavBarController(Widget):
     def setup(self, layout):
         createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
@@ -116,6 +118,9 @@ class TextEditor(Widget):
         popup = PopupInput()
         popup.setup()
 
+    def popupdismiss(instance):
+        print('here')
+
     def save_btn_press(instance):
         print('Save')
         fs = FileSystem()
@@ -149,13 +154,13 @@ class PopupInput(Widget):
         PopupInput.org = value
 
     def get_org(self):
-        return org
+        return PopupInput.org
 
     def set_pas(instance, value):
         PopupInput.pas = value
 
     def get_pas(self):
-        return pas
+        return PopupInput.pas
 
     def confirm(self):
         pass
@@ -181,8 +186,37 @@ class PopupInput(Widget):
 
     def confirm_clicked(self, x):
         PopupInput.popup.dismiss()
+        # validate the credentials
         print(PopupInput.org, PopupInput.pas)
-        return (PopupInput.org, PopupInput.pas)
+        organisation = PopupInput.org
+        password = PopupInput.pas
+        fs = FileSystem()
+        popup_msg = ""
+        err = True
+        try:
+            fs.getOrganisationKey(organisation, password)
+            popup_msg = "Logged in to: "+organisation
+            err = False
+        except FileNotFoundError:
+            # the organisation does not exis
+            popup_msg = "Organisation not found!"
+        except TypeError:
+            # password not provided
+            popup_msg = "Password not provided!"
+        except ValueError:
+            # invalid password
+            popup_msg = "Invalid Password!"
+        finally:
+            layout = BoxLayout(orientation='vertical')
+            popup_title = "Error" if err else "Confirmation"
+            label = Label(text=popup_msg)
+            button = Button(text='Dismiss')
+            layout.add_widget(label)
+            layout.add_widget(button)
+            popup = Popup(title=popup_title,
+                content=layout, size_hint=(None, None), size=(400, 250))
+            popup.open()
+            button.bind(on_press=popup.dismiss)
 
 class MainApp(App):
     def build(self):

@@ -8,15 +8,19 @@ from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
 from pygments.lexers import CythonLexer
+
+
 from kivy.uix.codeinput import CodeInput
 from filesystem import FileSystem
+from kivy.uix.popup import Popup
+
 
 class NavBarController(Widget):
     def setup(self, layout):
-        org_btn = Button(text='File')
-        import_btn = Button(text='Organisation')
-        save_btn = Button(text='Run')
-        run_btn = Button(text='Help')
+        org_btn = Button(text='File', font_size=14)
+        import_btn = Button(text='Organisation', font_size=14)
+        save_btn = Button(text='Run', font_size=14)
+        run_btn = Button(text='Help', font_size=14)
 
         btns = [org_btn, import_btn, save_btn, run_btn]
 
@@ -31,13 +35,13 @@ class NavBarController(Widget):
         btns[3].bind(on_press=TextEditor.run_btn_press)
 
 
-
-
 class TextEditor(Widget):
     app_container = ObjectProperty(None)
     nav_container = ObjectProperty(None)
     text_container = ObjectProperty(None)
     text = ""
+    organisation = None
+    password = None
 
     def on_text(instance, value):
         TextEditor.text = value
@@ -84,14 +88,31 @@ class TextEditor(Widget):
         print(TextEditor.text)
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
-        if modifier == ['ctrl'] and codepoint == 's':
+        print("Any Key")
+        print(modifier)
+        print(key)
+        print(codepoint)
+        if 'ctrl' in modifier and codepoint == 's':
             print("Clicked")
             self.save()
 
     def run_btn_press(instance):
         print('Run')
 
+class PopupInput(Widget):
 
+    def setup(self):
+        layout = BoxLayout()
+        labelOrg = Label(text='Organisation')
+        inputOrg = TextInput()
+        labelPas = Label(text='Password')
+        inputPas = TextInput()
+        layout.add_widget(labelOrg)
+        layout.add_widget(inputOrg)
+        layout.add_widget(labelPas)
+        layout.add_widget(inputPas)
+        popup = Popup(title='Enter credentials',
+            content=layout, size_hint=(None, None), size=(400, 400))
 
 class MainApp(App):
     def build(self):

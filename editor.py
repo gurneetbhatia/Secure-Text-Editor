@@ -27,6 +27,7 @@ class Root(FloatLayout):
         self._popup.dismiss()
 
     def show_load(self):
+        print('here')
         content = LoadDialog(load=self.load, cancel=self.dismiss_popup)
         self._popup = Popup(title="Load file", content=content,
                             size_hint=(0.9, 0.9))
@@ -39,6 +40,7 @@ class Root(FloatLayout):
         self._popup.open()
 
     def load(self, path, filename):
+        string = ""
         with open(os.path.join(path, filename[0])) as stream:
             self.text_input.text = stream.read()
 
@@ -55,10 +57,11 @@ class Editor(App):
     pass
 
 
-Factory.register('Root', cls=Root)
+#Factory.register('Root', cls=Root)
 Factory.register('LoadDialog', cls=LoadDialog)
 Factory.register('SaveDialog', cls=SaveDialog)
 
 
-if __name__ == '__main__':
-    Editor().run()
+'''if __name__ == '__main__':
+
+    Editor().run()'''

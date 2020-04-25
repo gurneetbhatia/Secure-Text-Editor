@@ -6,11 +6,11 @@ allows the user to create new files, read files and edit/save files
 '''
 class FileSystem:
     def __init__(self, localkeyspath='localkeys'):
-        this.local_keys_path = localkeyspath
+        self.local_keys_path = localkeyspath
 
     def isNewOrganisation(self, organisation):
         # check if organisation.key exists localkeys directory
-        keyPath = 'localkeys/'+organisation+'.key'
+        keyPath = self.local_keys_path+'/'+organisation+'.key'
         isNew = False
         try:
             keyFile = open(keyPath)
@@ -20,7 +20,7 @@ class FileSystem:
             return isNew
 
     def createOrganisation(self, organisation, password):
-        keyPath = 'localkeys/'+organisation+'.key'
+        keyPath = self.local_keys_path+'/'+organisation+'.key'
         enc = Encrypt()
         password = bytes(password, encoding='utf-8')
         # enc.privateKey needs to be saved
@@ -33,7 +33,7 @@ class FileSystem:
             f.write(pem)
 
     def getOrganisationKey(self, organisation, password):
-        keyPath = 'localkeys/'+organisation+'.key'
+        keyPath = self.local_keys_path+'/'+organisation+'.key'
         privateKey = None
         password = bytes(password, encoding='utf-8')
         with open(keyPath, 'rb') as key_file:
@@ -76,7 +76,7 @@ class FileSystem:
         return decrypted_contents
 
     def updateFile(self, filepath, contents, organisation, password):
-        # this function can be used when the user chooses to save their work
+        # self function can be used when the user chooses to save their work
         # get the key for the provided organisation
         key = self.getOrganisationKey(organisation, password)
         enc = Encrypt(key)

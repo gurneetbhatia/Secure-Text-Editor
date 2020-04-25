@@ -5,8 +5,9 @@ from cryptography.hazmat.primitives.asymmetric import padding
 #from cryptography.hazmat.primitives import serialization
 
 class Encrypt:
-    def __init__(self):
-        self.privateKey = self.getNewKey()
+    def __init__(self, key=None):
+        # optional argument of key allows the user to load pre-existent keys
+        self.privateKey = self.getNewKey() if key==None else key
 
     def getNewKey(self):
         return rsa.generate_private_key(public_exponent=65537,

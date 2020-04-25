@@ -40,11 +40,11 @@ class FileSystem:
             password=None,
             backend=default_backend()
             )
+        return privateKey
 
-    def import_file(self, filepath, savepath, organisation):
+    def importFile(self, filepath, organisation, savepath=None):
         # first check if the organisation is is a new one
-        isNew = self.isNewOrganisation(organisation)
-        if isNew:
+        if self.isNewOrganisation(organisation):
             self.createOrganisation(organisation)
 
         # read the file they provided, encrypt the contents and save it
@@ -56,11 +56,26 @@ class FileSystem:
         key = self.getOrganisationKey(organisation)
         enc = Encrypt(key)
         encrypted_contents = enc.encrypt_string(original_contents)
+        savepath = savepath+'.enc' if savepath == None else savepath
         encrypted_file = open(savepath, 'wb')
         encrypted_file.write(encrypted_contents)
         encrypted_file.close()
 
+    def readFile(self, filepath, organisation):
+        # get the key for the provided organisation
+        key = self.getOrganisationKey(organisation)
+        enc = Encrypt(key)
+
+        encrypted_file = open(filepath, 'rb')
+        encrypted_contents = encrypted_file.read()
+        encrypted_file.close()
+
+        decrypted_contents = enc.decrypt_string(encrypted_contents)
+        return decrypted_contents
+
+
 
 if __name__ == '__main__':
     f = FileSystem()
-    f.import_file('test.py', 'test.py.enc', 'Student Hack')
+    #f.importFile('test.py', 'Student Hack', 'test.py.enc')
+    print(f.readFile('test.py.enc', 'Student Hack'))

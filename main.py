@@ -7,7 +7,7 @@ from kivy.properties import (
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
-from pygments.lexers import CythonLexer
+from pygments.lexers import PythonLexer
 from pygments.lexers import JavaLexer
 from pygments.lexers import CppLexer
 
@@ -23,21 +23,8 @@ from kivy.base import runTouchApp
 
 from filesystem import FileSystem
 
-
-
-class NavBarController(Widget):
-    def setup(self, layout):
-        createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
-        loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
-        saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
-
-        createFile_btn.bind(on_press=TextEditor.create_btn_press)
-        loadFile_btn.bind(on_press=TextEditor.load_btn_press)
-        saveFile_btn.bind(on_press=TextEditor.save_btn_press)
-
-        file_btns = [createFile_btn, loadFile_btn, saveFile_btn]
-        fileDropDownSetup = DropDownController()
-        file_btn = fileDropDownSetup.setup(file_btns, "file")
+from tkinter import filedialog
+from tkinter import Tk
 
 class NavBarController:
     def setup(self, layout):
@@ -45,9 +32,22 @@ class NavBarController:
         save_btn = Button(text='Run', font_size=14)
         run_btn = Button(text='Help', font_size=14)
 
-        self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
-        self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
-        self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
+        self.createOrg_btn = Button(text='Create Org', font_size=14, size_hint_y=None, height=30)
+        self.loadOrg_btn = Button(text='Load Org', font_size=14, size_hint_y=None, height=30)
+        self.viewOrg_btn = Button(text='View Org', font_size=14, size_hint_y=None, height=30)
+
+        self.createOrg_btn.bind(on_press=TextEditor.createOrg_btn_press)
+        self.loadOrg_btn.bind(on_press=TextEditor.loadOrg_btn_press)
+        self.viewOrg_btn.bind(on_press=TextEditor.viewOrg_btn_press)
+
+        org_btns = [self.createOrg_btn, self.loadOrg_btn, self.viewOrg_btn]
+        orgDropDownSetup = DropDownController()
+        self.org_btn = orgDropDownSetup.setup(org_btns, "Organisation")
+        self.org_btn.size_hint_y = 1
+
+        self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=30)
+        self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=30)
+        self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=30)
 
         self.createFile_btn.bind(on_press=TextEditor.create_btn_press)
         self.loadFile_btn.bind(on_press=TextEditor.load_btn_press)
@@ -55,19 +55,18 @@ class NavBarController:
 
         file_btns = [self.createFile_btn, self.loadFile_btn, self.saveFile_btn]
         fileDropDownSetup = DropDownController()
-        self.file_btn = fileDropDownSetup.setup(file_btns, "file")
-
-        btns = [import_btn, save_btn, run_btn]
+        self.file_btn = fileDropDownSetup.setup(file_btns, "File")
         self.file_btn.size_hint_y = 1
-        layout.add_widget(self.file_btn)
+
         btns = [import_btn, save_btn, run_btn]
 
-        layout.add_widget(file_btn)
+
+        layout.add_widget(self.file_btn)
+        layout.add_widget(self.org_btn)
+        btns = [import_btn, save_btn, run_btn]
+
         for btn in btns:
             layout.add_widget(btn)
-
-
-
 
         btns[0].bind(on_press=TextEditor.import_btn_press)
         btns[1].bind(on_press=TextEditor.save_btn_press)
@@ -94,9 +93,11 @@ class TextEditor(Widget):
     app_container = ObjectProperty(None)
     nav_container = ObjectProperty(None)
     text_container = ObjectProperty(None)
+    lex = None
     text = ""
     organisation = None
     password = None
+    filepath = None
 
     def on_text(instance, value):
         TextEditor.text = value
@@ -114,13 +115,26 @@ class TextEditor(Widget):
         navBar = NavBarController()
         navBarBtnsContainer = navBar.setup(self.nav_container)
 
-        codeinput = CodeInput(lexer=CythonLexer())
+        codeinput = CodeInput(lexer=PythonLexer())
+        self.choose_lexer()
+        codeinput.lexer = TextEditor.lex
         codeinput.bind(text=TextEditor.on_text)
 
         self.text_container.add_widget(codeinput)
 
-
-
+    def choose_lexer(self):
+        fs = FileSystem()
+        if TextEditor.filepath != None:
+            ext = fs.getFileType(TextEditor.filepath)
+            if ext == 'py':
+                TextEditor.lex = PythonLexer()
+            elif ext == 'java':
+                TextEditor.lex = JavaLexer()
+            elif ext == 'cpp':
+                TextEditor.lex = CppLexer()
+        else:
+            # No extension
+            TextEditor.lex = PythonLexer()
 
     def on_window_resize(self, window, width, height):
         print("width", width)
@@ -131,10 +145,25 @@ class TextEditor(Widget):
     # FILE DROPDOWN EVENTS
     def create_btn_press(instance):
         print("Create")
+
     def load_btn_press(instance):
         print("Load")
+        tk = Tk()
+        tk.geometry('0x0+0+0')
+        filename = filedialog.askopenfilename(title="Select a .enc file", filetypes=("enc files", "*.enc"))
+        print(filename)
+        tk.destroy()
+
     def save_btn_press(instance):
         print("Save")
+
+    # ORG DROPDOWN EVENTS
+    def createOrg_btn_press(instance):
+        print("Create Org")
+    def loadOrg_btn_press(instance):
+        print("Load Org")
+    def viewOrg_btn_press(instance):
+        print("View Orgs")
 
     def org_btn_press(instance):
         print('File')
@@ -243,6 +272,7 @@ class PopupInput(Widget):
                 content=layout, size_hint=(None, None), size=(400, 250))
             popup.open()
             button.bind(on_press=popup.dismiss)
+
 
 class MainApp(App):
     def build(self):

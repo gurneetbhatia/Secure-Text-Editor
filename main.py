@@ -130,6 +130,11 @@ class TextEditor(Widget):
         self.text_container.add_widget(TextEditor.codeinput)
 
     def updateCodeInput(newstring):
+        print('hereeeeeeee')
+        print(newstring)
+        TextEditor.codeinput.text = newstring
+
+    def updateCodeInput(newstring):
         print(newstring)
         TextEditor.codeinput.text = newstring
 

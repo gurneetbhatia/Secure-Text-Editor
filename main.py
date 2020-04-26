@@ -553,10 +553,33 @@ class LoadSaveDialog(FloatLayout):
         self.dismiss_popup()
 
     def save(self, path, filename):
-        with open(os.path.join(path, filename), 'w') as stream:
-            stream.write(self.text_input.text)
+        #with open(os.path.join(path, filename), 'w') as stream:
+            #stream.write(self.text_input.text)
+        filename = os.path.join(path, filename)
+        organisation = cache['organisation']
+        password = cache['password']
+        # only save an encrypted version of this file
+        if (cache['organisation'] != None):
+            fs = FileSystem()
+            fs.createFile(filename, organisation, password, TextEditor.text)
+        else:
+            # the user needs to be prompted to login first
+            popup_msg = "Please login to an organisation first!"
+            layout = BoxLayout(orientation='vertical')
+            popup_title = "Error"
+            label1 = Label(text=popup_title)
+            label = Label(text=popup_msg)
+            button = Button(text='Dismiss')
+            layout.add_widget(label1)
+            layout.add_widget(label)
+            layout.add_widget(button)
+            popup = Popup(title=popup_title,
+                content=layout, size_hint=(0.6, 0.6))
+            popup.open()
+            button.bind(on_press=popup.dismiss)
 
         self.dismiss_popup()
+            
 
 
 class MainApp(App):

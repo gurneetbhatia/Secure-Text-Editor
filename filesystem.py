@@ -87,9 +87,9 @@ class FileSystem:
         encrypted_file.write(encrypted_contents)
         encrypted_file.close()
 
-    def createFile(self, filepath, organisation, password):
+    def createFile(self, filepath, organisation, password, contents=''):
         # make an empty file
-        self.updateFile(filepath + ".enc", '', organisation, password)
+        self.updateFile(filepath + ".enc", contents, organisation, password)
 
     def getFileType(self, filepath):
         return filepath.split('.')[-2]

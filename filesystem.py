@@ -101,6 +101,10 @@ class FileSystem:
         if file_ext == 'py':
             exec(decrypted_contents)
         elif file_ext == 'java':
+            elems = filepath.split('/')
+            dir = '/'.join(elems[:-1])
+            os.chdir(dir)
+            filepath = elems[-1]
             # create a temporary file
             filename = filepath[:-4]
             appname = filename[:-5]
@@ -146,9 +150,9 @@ if __name__ == '__main__':
     # f.createFile('test1.py.enc', 'Student Hack', 'test1234')
     # f.run('test1.py.enc', 'Student Hack', 'test1234')
     #
-    # f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
-    # print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
-    # f.run('Test.java.enc', 'Student Hack', 'test1234')
+    #f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
+    print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
+    f.run('Test.java.enc', 'Student Hack', 'test1234')
     #
     # f.importFile('test.cpp', 'Student Hack', 'test1234', 'test.cpp.enc')
     # print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
@@ -157,4 +161,6 @@ if __name__ == '__main__':
     # print(f.readFile('args-test.py.enc', 'Student Hack', 'test1234'))
     # print('here')
     # f.run('args-test.py.enc', 'Student Hack', 'test1234', [1,2,3,4,5])
-    print(f.getOrganisationsList())
+    #print(f.getOrganisationsList())
+    # f.importFile('main.py', 'Student Hack', 'test1234')
+    # print(f.readFile('main.py.enc', 'Student Hack', 'test1234'))

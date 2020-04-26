@@ -125,6 +125,7 @@ class TextEditor(Widget):
     organisation = None
     password = None
     codeinput = None
+    currentFile = None
 
     def on_text(instance, value):
         TextEditor.text = value
@@ -145,7 +146,6 @@ class TextEditor(Widget):
 
         TextEditor.codeinput = CodeInput(lexer=CythonLexer())
         TextEditor.codeinput.bind(text=TextEditor.on_text)
-        TextEditor.codeinput.text = 'start'
 
         self.text_container.add_widget(TextEditor.codeinput)
 
@@ -172,8 +172,8 @@ class TextEditor(Widget):
         lsd = LoadSaveDialog()
         lsd.show_load()
 
-    def save_btn_press(instance):
-        print("Save")
+    '''def save_btn_press(instance):
+        print("Save")'''
 
     # ORG DROPDOWN EVENTS
     def createOrg_btn_press(instance):
@@ -203,9 +203,9 @@ class TextEditor(Widget):
 
     def save_btn_press(instance):
         pass
-        # print('Save')
-        # fs = FileSystem()
-        # fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
+        print('Save')
+        fs = FileSystem()
+        fs.updateFile(TextEditor.currentFile, TextEditor.text, cache['organisation'], cache['password'])
         # print(TextEditor.text)
 
     def save(self):
@@ -451,10 +451,8 @@ class LoadSaveDialog(FloatLayout):
                 # the file needs to be encrypted first
                 print('here3')
                 fs.createFile(filename[0], organisation, password)
-                print(TextEditor.codeinput.text)
                 TextEditor.updateCodeInput(LoadSaveDialog.string)
-                print(TextEditor.codeinput.text)
-                print(LoadSaveDialog.string)
+                TextEditor.currentFile = filename[0]+'.enc'
             else:
                 try:
                     print(fs.readFile(filename[0], organisation, password))

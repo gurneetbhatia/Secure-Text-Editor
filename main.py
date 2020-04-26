@@ -444,6 +444,9 @@ class LoadSaveDialog(FloatLayout):
             # the user is logged in to an org
             organisation = cache['organisation']
             password = cache['password']
+            print(filename)
+            fs = FileSystem()
+            ext = filename[0].split('.')[-1]
             if ext != 'enc':
                 # the file needs to be encrypted first
                 print('here3')

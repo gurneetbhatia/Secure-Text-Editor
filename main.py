@@ -213,10 +213,10 @@ class TextEditor(Widget):
     def save_btn_press(instance):
         pass
         print('Save')
-        self.save()
+        TextEditor.save()
         # print(TextEditor.text)
 
-    def save(self):
+    def save():
         if(TextEditor.currentFile != None):
             fs = FileSystem()
             fs.updateFile(TextEditor.currentFile, TextEditor.text, cache['organisation'], cache['password'])
@@ -231,7 +231,7 @@ class TextEditor(Widget):
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
         if 'ctrl' in modifier and codepoint == 's':
             print("Clicked")
-            self.save()
+            TextEditor.save()
 
     def run_btn_press(instance):
         print('Run')

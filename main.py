@@ -166,6 +166,9 @@ class TextEditor(Widget):
     # FILE DROPDOWN EVENTS
     def create_btn_press(instance):
         print("Create")
+        TextEditor.updateCodeInput('')
+        lsd = LoadSaveDialog()
+        lsd.show_save()
 
     def load_btn_press(instance):
         print("Load")
@@ -579,7 +582,7 @@ class LoadSaveDialog(FloatLayout):
             button.bind(on_press=popup.dismiss)
 
         self.dismiss_popup()
-            
+
 
 
 class MainApp(App):

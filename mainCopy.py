@@ -1,4 +1,3 @@
-
 from kivy.app import App
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
@@ -8,7 +7,7 @@ from kivy.properties import (
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
-from pygments.lexers import CythonLexer
+from pygments.lexers import PythonLexer
 from pygments.lexers import JavaLexer
 from pygments.lexers import CppLexer
 
@@ -33,29 +32,18 @@ import os
 
 import tkinter as tk
 
+
 class NavBarController:
     def setup(self, layout):
         import_btn = Button(text='Organisation', font_size=14)
         save_btn = Button(text='Run', font_size=14)
         run_btn = Button(text='Help', font_size=14)
 
-        self.createOrg_btn = Button(text='Create Org', font_size=14, size_hint_y=None, height=30)
-        self.loadOrg_btn = Button(text='Load Org', font_size=14, size_hint_y=None, height=30)
-        self.viewOrg_btn = Button(text='View Org', font_size=14, size_hint_y=None, height=30)
 
-        self.createOrg_btn.bind(on_press=TextEditor.createOrg_btn_press)
-        self.loadOrg_btn.bind(on_press=TextEditor.loadOrg_btn_press)
-        self.viewOrg_btn.bind(on_press=TextEditor.viewOrg_btn_press)
-
-        org_btns = [self.createOrg_btn, self.loadOrg_btn, self.viewOrg_btn]
-        self.orgDropDownSetup = DropDownController()
-        self.org_btn = self.orgDropDownSetup.setup(org_btns, "Organisation")
-        self.org_btn.size_hint_y = 1
-
-        self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
-        self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=44)
-        self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
-        self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
+        self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=30)
+        self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=30)
+        self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=30)
+        self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=30)
 
         self.createFile_btn.bind(on_press=TextEditor.create_btn_press)
         self.import_btn.bind(on_press=TextEditor.import_file_btn_press)
@@ -63,17 +51,14 @@ class NavBarController:
         self.saveFile_btn.bind(on_press=TextEditor.save_btn_press)
 
         file_btns = [self.createFile_btn, self.import_btn, self.loadFile_btn, self.saveFile_btn]
+        fileDropDownSetup = DropDownController()
+        self.file_btn = fileDropDownSetup.setup(file_btns, "File")
+        self.file_btn.size_hint_y = 1
 
-        self.fileDropdown = DropDown()
-        for btn in file_btns:
-            btn.bind(on_release=lambda btn: self.fileDropdown.select(btn.text))
-            self.fileDropdown.add_widget(btn)
-        self.fileButton = Button(text="File", size_hint=(None, None), height = 14)
-        self.fileButton.bind(on_release=self.fileDropdown.open)
-        self.fileButton.size_hint_y = 1
         btns = [import_btn, save_btn, run_btn]
 
-        layout.add_widget(self.fileButton)
+
+        layout.add_widget(self.file_btn)
         layout.add_widget(self.org_btn)
         btns = [import_btn, save_btn, run_btn]
 
@@ -84,28 +69,32 @@ class NavBarController:
         btns[1].bind(on_press=TextEditor.save_btn_press)
         btns[2].bind(on_press=TextEditor.run_btn_press)
 
-
-class DropDownController():
+class DropDownController(Widget):
     def setup(self, btns, title):
-        self.dropdown = DropDown()
+        print("Done")
+        dropdown = DropDown()
         for btn in btns:
-            btn.bind(on_release=lambda btn: self.dropdown.select(btn.text))
-            self.dropdown.add_widget(btn)
-        mainbutton = Button(text=title, size_hint=(None, None), height = 14)
-        mainbutton.bind(on_release=self.dropdown.open, on_press=self.printPressed)
-        return mainbutton
+            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
+            dropdown.add_widget(btn)
+        self.mainbutton = Button(text=title, size_hint=(None, None), height = 14)
+        self.mainbutton.bind(on_release=dropdown.open)
+        return self.mainbutton
 
-    def printPressed(self, x):
-        print("pressed")
+        mainbutton = Button(text='File', size_hint=(None, None))
+        print(mainbutton.text)
+        mainbutton.bind(on_release=dropdown.open)
+        dropdown.bind(on_select=lambda instance, x: setattr(mainbutton, 'text', x))
+        return mainbutton
 
 class TextEditor(Widget):
     app_container = ObjectProperty(None)
     nav_container = ObjectProperty(None)
     text_container = ObjectProperty(None)
+    lex = None
     text = ""
     organisation = None
     password = None
-    codeinput = None
+    filepath = None
 
     def on_text(instance, value):
         TextEditor.text = value
@@ -123,15 +112,26 @@ class TextEditor(Widget):
         navBar = NavBarController()
         navBarBtnsContainer = navBar.setup(self.nav_container)
 
-        TextEditor.codeinput = CodeInput(lexer=CythonLexer())
-        TextEditor.codeinput.bind(text=TextEditor.on_text)
-        TextEditor.codeinput.text = 'start'
+        codeinput = CodeInput(lexer=PythonLexer())
+        self.choose_lexer()
+        codeinput.lexer = TextEditor.lex
+        codeinput.bind(text=TextEditor.on_text)
 
-        self.text_container.add_widget(TextEditor.codeinput)
+        self.text_container.add_widget(codeinput)
 
-    def updateCodeInput(newstring):
-        print(newstring)
-        TextEditor.codeinput.text = newstring
+    def choose_lexer(self):
+        fs = FileSystem()
+        if TextEditor.filepath != None:
+            ext = fs.getFileType(TextEditor.filepath)
+            if ext == 'py':
+                TextEditor.lex = PythonLexer()
+            elif ext == 'java':
+                TextEditor.lex = JavaLexer()
+            elif ext == 'cpp':
+                TextEditor.lex = CppLexer()
+        else:
+            # No extension
+            TextEditor.lex = PythonLexer()
 
     def on_window_resize(self, window, width, height):
         print("width", width)
@@ -218,6 +218,7 @@ class PopupInput(Widget):
         pass
 
     def setup(self):
+        print("This Setup")
         layout = BoxLayout(orientation='vertical')
         labelOrg = Label(text='Organisation')
         inputOrg = TextInput(multiline=False)
@@ -231,12 +232,14 @@ class PopupInput(Widget):
         layout.add_widget(button)
         inputOrg.bind(text=PopupInput.set_org)
         inputPas.bind(text=PopupInput.set_pas)
+        button.bind(on_press=self.confirm_clicked)
         PopupInput.popup = Popup(title='Enter credentials',
             content=layout, size_hint=(None, None), size=(400, 250))
         PopupInput.popup.open()
-        button.bind(on_press=self.confirm_clicked)
+
 
     def confirm_clicked(self, x):
+        print('Dismiss')
         PopupInput.popup.dismiss()
         # validate the credentials
         print(PopupInput.org, PopupInput.pas)
@@ -285,23 +288,7 @@ class LoadSaveDialog(FloatLayout):
     loadfile = ObjectProperty(None)
     savefile = ObjectProperty(None)
     #text_input = ObjectProperty(None)
-    string = ""
-    file_to_load = None
-    org = ''
-    pas = ''
-    popup = None
-
-    def set_org(instance, value):
-        PopupInput.org = value
-
-    def get_org(self):
-        return PopupInput.org
-
-    def set_pas(instance, value):
-        PopupInput.pas = value
-
-    def get_pas(self):
-        return PopupInput.pas
+    showingLoad = False
 
     def dismiss_popup(self):
         self._popup.dismiss()
@@ -320,11 +307,13 @@ class LoadSaveDialog(FloatLayout):
         self._popup.open()
 
     def load(self, path, filename):
-        LoadSaveDialog.file_to_load = filename
+        string = ""
         with open(os.path.join(path, filename[0])) as stream:
-            LoadSaveDialog.string= stream.read()
+            string= stream.read()
 
         print(path, filename)
+        ext = filename[0].split('.')[-1]
+        fs = FileSystem()
         # ask the user for organisation name and password
         layout = BoxLayout(orientation='vertical')
         labelOrg = Label(text='Organisation')
@@ -339,68 +328,14 @@ class LoadSaveDialog(FloatLayout):
         layout.add_widget(button)
         inputOrg.bind(text=PopupInput.set_org)
         inputPas.bind(text=PopupInput.set_pas)
-        LoadSaveDialog.popup = Popup(title='Enter credentials',
+        popup = Popup(title='Enter credentials',
             content=layout, size_hint=(None, None), size=(400, 250))
-        LoadSaveDialog.popup.open()
-        button.bind(on_press=self.confirm_clicked)
-        '''if ext != 'enc':
+        popup.open()
+        if ext != 'enc':
             # the file needs to be encrypted
-            '''
+            pass
 
         self.dismiss_popup()
-
-    def confirm_clicked(self, x):
-        LoadSaveDialog.popup.dismiss()
-        filename = LoadSaveDialog.file_to_load
-        # validate the credentials
-        #print(PopupInput.org, PopupInput.pas)
-        organisation = PopupInput.org
-        password = PopupInput.pas
-        fs = FileSystem()
-        popup_msg = ""
-        err = True
-        try:
-            print('here2')
-            fs.getOrganisationKey(organisation, password)
-            popup_msg = "Logged in to: "+organisation
-            err = False
-            ext = filename[0].split('.')[-1]
-            print('here1')
-            print(LoadSaveDialog.string)
-            if ext != 'enc':
-                # the file needs to be encrypted first
-                print('here3')
-                fs.createFile(filename[0], organisation, password)
-                print(TextEditor.codeinput.text)
-                TextEditor.updateCodeInput(LoadSaveDialog.string)
-                print(TextEditor.codeinput.text)
-                print(LoadSaveDialog.string)
-            else:
-                print(fs.readFile(filename, organisation, password))
-                TextEditor.codeinput.text = fs.readFile(filename, organisation, password)
-        except FileNotFoundError:
-            # the organisation does not exis
-            popup_msg = "Organisation not found!"
-        except TypeError as e:
-            # password not provided
-            print(e.print_tb())
-            popup_msg = "Password not provided!"
-        except ValueError:
-            # invalid password
-            popup_msg = "Invalid Password!"
-        finally:
-            #if err:
-            layout = BoxLayout(orientation='vertical')
-            popup_title = "Error" if err else "Confirmation"
-            label = Label(text=popup_msg)
-            button = Button(text='Dismiss')
-            layout.add_widget(label)
-            layout.add_widget(button)
-            popup = Popup(title=popup_title,
-                content=layout, size_hint=(None, None), size=(400, 250))
-            popup.open()
-            button.bind(on_press=popup.dismiss)
-            print("Done")
 
     def save(self, path, filename):
         with open(os.path.join(path, filename), 'w') as stream:
@@ -408,11 +343,9 @@ class LoadSaveDialog(FloatLayout):
 
         self.dismiss_popup()
 
-ref = None
 class MainApp(App):
     def build(self):
         app = TextEditor()
-        ref = app
         app.setup()
         return app
 

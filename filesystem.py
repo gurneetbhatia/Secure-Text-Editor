@@ -89,7 +89,7 @@ class FileSystem:
 
     def createFile(self, filepath, organisation, password):
         # make an empty file
-        self.updateFile(filepath, '', organisation, password)
+        self.updateFile(filepath + ".enc", '', organisation, password)
 
     def getFileType(self, filepath):
         return filepath.split('.')[-2]

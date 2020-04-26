@@ -34,6 +34,9 @@ import os
 import tkinter as tk
 
 class NavBarController:
+    fileDropdown = DropDown()
+    orgDropdown = DropDown()
+
     def setup(self, layout):
         import_btn = Button(text='Organisation', font_size=14)
         save_btn = Button(text='Run', font_size=14)
@@ -48,9 +51,10 @@ class NavBarController:
         self.viewOrg_btn.bind(on_press=TextEditor.viewOrg_btn_press)
 
         org_btns = [self.createOrg_btn, self.loadOrg_btn, self.viewOrg_btn]
-        self.orgDropDownSetup = DropDownController()
-        self.org_btn = self.orgDropDownSetup.setup(org_btns, "Organisation")
-        self.org_btn.size_hint_y = 1
+
+        orgDropDownSetup = DropDownController()
+        self.orgButton = orgDropDownSetup.setup(NavBarController.orgDropdown, org_btns, "Organisation")
+        self.orgButton.size_hint_y = 1
 
         self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
         self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=44)
@@ -64,18 +68,13 @@ class NavBarController:
 
         file_btns = [self.createFile_btn, self.import_btn, self.loadFile_btn, self.saveFile_btn]
 
-        self.fileDropdown = DropDown()
-        for btn in file_btns:
-            btn.bind(on_release=lambda btn: self.fileDropdown.select(btn.text))
-            self.fileDropdown.add_widget(btn)
-        self.fileButton = Button(text="File", size_hint=(None, None), height = 14)
-        self.fileButton.bind(on_release=self.fileDropdown.open)
+        fileDropDownSetup = DropDownController()
+        self.fileButton = fileDropDownSetup.setup(NavBarController.fileDropdown, file_btns, "File")
         self.fileButton.size_hint_y = 1
         btns = [import_btn, save_btn, run_btn]
 
-        layout.add_widget(self.fileButton)
-        layout.add_widget(self.org_btn)
-        btns = [import_btn, save_btn, run_btn]
+        # layout.add_widget(self.org_btn)
+        btns = [import_btn, save_btn, run_btn, self.fileButton, self.orgButton]
 
         for btn in btns:
             layout.add_widget(btn)
@@ -83,16 +82,21 @@ class NavBarController:
         btns[0].bind(on_press=TextEditor.import_btn_press)
         btns[1].bind(on_press=TextEditor.save_btn_press)
         btns[2].bind(on_press=TextEditor.run_btn_press)
+        btns[3].bind(on_release=NavBarController.fileDropdown.open, on_press=NavBarController.printPressed)
+        btns[4].bind(on_release=NavBarController.orgDropdown.open, on_press=NavBarController.printPressed)
+
+
+    def printPressed(a):
+        print("Press")
 
 
 class DropDownController():
-    def setup(self, btns, title):
-        self.dropdown = DropDown()
+    def setup(self, dropdown, btns, title):
         for btn in btns:
-            btn.bind(on_release=lambda btn: self.dropdown.select(btn.text))
-            self.dropdown.add_widget(btn)
+            btn.bind(on_release=lambda btn: dropdown.select(btn.text))
+            dropdown.add_widget(btn)
         mainbutton = Button(text=title, size_hint=(None, None), height = 14)
-        mainbutton.bind(on_release=self.dropdown.open, on_press=self.printPressed)
+        mainbutton.bind(on_release=dropdown.open, on_press=self.printPressed)
         return mainbutton
 
     def printPressed(self, x):

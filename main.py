@@ -192,6 +192,10 @@ class TextEditor(Widget):
     # RUN DROPDOWN EVENTS
     def runBasic_btn_press(instance):
         print("Basic Run")
+        if(TextEditor.currentFile != None):
+            fs = FileSystem()
+            fs.run(TextEditor.currentFile, cache['organisation'], cache['password'])
+
     def runWidthArgs_btn_press(instance):
         print("Run Args")
     def compile_btn_press(instance):
@@ -492,70 +496,16 @@ class LoadSaveDialog(FloatLayout):
 
         self.dismiss_popup()
 
-    '''def confirm_clicked(self, x):
-        LoadSaveDialog.popup.dismiss()
-        filename = LoadSaveDialog.file_to_load
-        # validate the credentials
-        #print(PopupInput.org, PopupInput.pas)
-        organisation = PopupInput.org
-        password = PopupInput.pas
-        fs = FileSystem()
-        popup_msg = ""
-        err = True
-        try:
-            print('here2')
-            fs.getOrganisationKey(organisation, password)
-            popup_msg = "Logged in to: "+organisation
-            err = False
-            ext = filename[0].split('.')[-1]
-            print('here1')
-            print(LoadSaveDialog.string)
-            if ext != 'enc':
-                # the file needs to be encrypted first
-                print('here3')
-                fs.createFile(filename[0], organisation, password)
-                print(TextEditor.codeinput.text)
-                TextEditor.updateCodeInput(LoadSaveDialog.string)
-                print(TextEditor.codeinput.text)
-                print(LoadSaveDialog.string)
-            else:
-                print(fs.readFile(filename, organisation, password))
-                TextEditor.codeinput.text = fs.readFile(filename, organisation, password)
-        except FileNotFoundError:
-            # the organisation does not exis
-            popup_msg = "Organisation not found!"
-        except TypeError as e:
-            # password not provided
-            print(e.print_tb())
-            popup_msg = "Password not provided!"
-        except ValueError:
-            # invalid password
-            popup_msg = "Invalid Password!"
-        finally:
-            #if err:
-            layout = BoxLayout(orientation='vertical')
-            popup_title = "Error" if err else "Confirmation"
-            label = Label(text=popup_msg)
-            button = Button(text='Dismiss')
-            layout.add_widget(label)
-            layout.add_widget(button)
-            popup = Popup(title=popup_title,
-                content=layout, size_hint=(None, None), size=(400, 250))
-            popup.open()
-            button.bind(on_press=popup.dismiss)
-            print("Done")'''
-
     def save(self, path, filename):
         with open(os.path.join(path, filename), 'w') as stream:
             stream.write(self.text_input.text)
 
         self.dismiss_popup()
 
-ref = None
+
 class MainApp(App):
     def build(self):
         app = TextEditor()
-        ref = app
         app.setup()
         return app
 

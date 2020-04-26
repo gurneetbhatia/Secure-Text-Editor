@@ -108,7 +108,7 @@ class FileSystem:
             file.write(decrypted_contents)
             file.close()
             os.system('javac '+''.join(args)+filename)
-            os.system('java '+appname)
+            os.system('java '+''.join(args)+appname)
             os.remove(filename)
             os.remove(appname+'.class')
         elif file_ext == 'cpp':
@@ -128,18 +128,19 @@ class FileSystem:
 
 if __name__ == '__main__':
     f = FileSystem()
-    #f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
-    print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
+    f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
+    #print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
+    f.run('test.py.enc', 'Student Hack', 'test1234')
     #f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
     #'test1234')
-    print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
-    f.createFile('test1.py.enc', 'Student Hack', 'test1234')
-    f.run('test1.py.enc', 'Student Hack', 'test1234')
+    #print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
+    #f.createFile('test1.py.enc', 'Student Hack', 'test1234')
+    #f.run('test1.py.enc', 'Student Hack', 'test1234')
 
     #f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
     #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
-    f.run('Test.java.enc', 'Student Hack', 'test1234')
+    #f.run('Test.java.enc', 'Student Hack', 'test1234')
 
     #f.importFile('test.cpp', 'Student Hack', 'test1234', 'test.cpp.enc')
     #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
-    f.run('test.cpp.enc', 'Student Hack', 'test1234')
+    #f.run('test.cpp.enc', 'Student Hack', 'test1234')

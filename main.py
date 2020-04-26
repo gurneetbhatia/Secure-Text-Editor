@@ -111,6 +111,7 @@ class TextEditor(Widget):
     text = ""
     organisation = None
     password = None
+    codeinput = None
 
     def on_text(instance, value):
         TextEditor.text = value
@@ -128,12 +129,16 @@ class TextEditor(Widget):
         navBar = NavBarController()
         navBarBtnsContainer = navBar.setup(self.nav_container)
 
-        codeinput = CodeInput(lexer=CythonLexer())
-        codeinput.bind(text=TextEditor.on_text)
+        TextEditor.codeinput = CodeInput(lexer=CythonLexer())
+        TextEditor.codeinput.bind(text=TextEditor.on_text)
+        TextEditor.codeinput.text = 'start'
 
-        self.text_container.add_widget(codeinput)
+        self.text_container.add_widget(TextEditor.codeinput)
 
-
+    def updateCodeInput(newstring):
+        print('hereeeeeeee')
+        print(newstring)
+        TextEditor.codeinput.text = newstring
 
 
     def on_window_resize(self, window, width, height):
@@ -280,7 +285,23 @@ class LoadSaveDialog(FloatLayout):
     loadfile = ObjectProperty(None)
     savefile = ObjectProperty(None)
     #text_input = ObjectProperty(None)
-    showingLoad = False
+    string = ""
+    file_to_load = None
+    org = ''
+    pas = ''
+    popup = None
+
+    def set_org(instance, value):
+        PopupInput.org = value
+
+    def get_org(self):
+        return PopupInput.org
+
+    def set_pas(instance, value):
+        PopupInput.pas = value
+
+    def get_pas(self):
+        return PopupInput.pas
 
     def dismiss_popup(self):
         self._popup.dismiss()
@@ -299,13 +320,11 @@ class LoadSaveDialog(FloatLayout):
         self._popup.open()
 
     def load(self, path, filename):
-        string = ""
+        LoadSaveDialog.file_to_load = filename
         with open(os.path.join(path, filename[0])) as stream:
-            string= stream.read()
+            LoadSaveDialog.string= stream.read()
 
         print(path, filename)
-        ext = filename[0].split('.')[-1]
-        fs = FileSystem()
         # ask the user for organisation name and password
         layout = BoxLayout(orientation='vertical')
         labelOrg = Label(text='Organisation')
@@ -320,14 +339,66 @@ class LoadSaveDialog(FloatLayout):
         layout.add_widget(button)
         inputOrg.bind(text=PopupInput.set_org)
         inputPas.bind(text=PopupInput.set_pas)
-        popup = Popup(title='Enter credentials',
+        LoadSaveDialog.popup = Popup(title='Enter credentials',
             content=layout, size_hint=(None, None), size=(400, 250))
-        popup.open()
-        if ext != 'enc':
+        LoadSaveDialog.popup.open()
+        button.bind(on_press=self.confirm_clicked)
+        '''if ext != 'enc':
             # the file needs to be encrypted
-            pass
+            '''
 
         self.dismiss_popup()
+
+    def confirm_clicked(self, x):
+        LoadSaveDialog.popup.dismiss()
+        filename = LoadSaveDialog.file_to_load
+        # validate the credentials
+        #print(PopupInput.org, PopupInput.pas)
+        organisation = PopupInput.org
+        password = PopupInput.pas
+        fs = FileSystem()
+        popup_msg = ""
+        err = True
+        try:
+            print('here2')
+            fs.getOrganisationKey(organisation, password)
+            popup_msg = "Logged in to: "+organisation
+            err = False
+            ext = filename[0].split('.')[-1]
+            print('here1')
+            print(LoadSaveDialog.string)
+            if ext != 'enc':
+                # the file needs to be encrypted first
+                print('here3')
+                fs.createFile(filename, organisation, password)
+                print(TextEditor.codeinput.text)
+                TextEditor.updateCodeInput(LoadSaveDialog.string)
+                print(TextEditor.codeinput.text)
+                print(LoadSaveDialog.string)
+            else:
+                print(fs.readFile(filename, organisation, password))
+                TextEditor.codeinput.text = fs.readFile(filename, organisation, password)
+        except FileNotFoundError:
+            # the organisation does not exis
+            popup_msg = "Organisation not found!"
+        except TypeError:
+            # password not provided
+            popup_msg = "Password not provided!"
+        except ValueError:
+            # invalid password
+            popup_msg = "Invalid Password!"
+        finally:
+            if err:
+                layout = BoxLayout(orientation='vertical')
+                popup_title = "Error" if err else "Confirmation"
+                label = Label(text=popup_msg)
+                button = Button(text='Dismiss')
+                layout.add_widget(label)
+                layout.add_widget(button)
+                popup = Popup(title=popup_title,
+                    content=layout, size_hint=(None, None), size=(400, 250))
+                popup.open()
+                button.bind(on_press=popup.dismiss)
 
     def save(self, path, filename):
         with open(os.path.join(path, filename), 'w') as stream:
@@ -335,9 +406,11 @@ class LoadSaveDialog(FloatLayout):
 
         self.dismiss_popup()
 
+ref = None
 class MainApp(App):
     def build(self):
         app = TextEditor()
+        ref = app
         app.setup()
         return app
 

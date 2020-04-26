@@ -204,12 +204,13 @@ class TextEditor(Widget):
     def save_btn_press(instance):
         pass
         print('Save')
-        fs = FileSystem()
-        fs.updateFile(TextEditor.currentFile, TextEditor.text, cache['organisation'], cache['password'])
+        self.save()
         # print(TextEditor.text)
 
     def save(self):
-        pass
+        if(TextEditor.currentFile != None):
+            fs = FileSystem()
+            fs.updateFile(TextEditor.currentFile, TextEditor.text, cache['organisation'], cache['password'])
         # print('Save')
         # fs = FileSystem()
         # fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')

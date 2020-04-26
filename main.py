@@ -266,9 +266,7 @@ class CreateOrgPopup(Widget):
         print('here1')
 
     def confirm_clicked(self, x):
-        print('hereeeee')
         CreateOrgPopup.popup.dismiss()
-        print('hereeee')
         # validate the credentials
         print(CreateOrgPopup.org, CreateOrgPopup.pas)
         organisation = CreateOrgPopup.org
@@ -279,6 +277,8 @@ class CreateOrgPopup(Widget):
         popup_msg = ""
         err = False
         try:
+            if(len(password) == 0):
+                raise ValueError()
             fs.getOrganisationKey(organisation, password)
             popup_msg = "Organisation already exists!"
             err = True
@@ -287,6 +287,22 @@ class CreateOrgPopup(Widget):
             fs.createOrganisation(organisation, password)
             cache['organisation'] = organisation
             cache['password'] = password
+            popup_msg = "Organisation created successfully!"
+        except ValueError:
+            err = True
+            popup_msg = "Please provide a password!"
+        finally:
+            layout = BoxLayout(orientation='vertical')
+            popup_title = "Error" if err else "Confirmation"
+            label1 = Label(text=popup_title)
+            label = Label(text=popup_msg)
+            button = Button(text='Dismiss')
+            layout.add_widget(label)
+            layout.add_widget(button)
+            popup = Popup(title=popup_title,
+                content=layout, size_hint=(None, None), size=(400, 250))
+            popup.open()
+            button.bind(on_press=popup.dismiss)
 
 
 

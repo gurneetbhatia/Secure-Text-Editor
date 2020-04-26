@@ -8,7 +8,7 @@ from kivy.properties import (
 from kivy.core.window import Window
 from kivy.uix.boxlayout import BoxLayout
 from kivy.config import Config
-from pygments.lexers import CythonLexer
+from pygments.lexers import PythonLexer
 from pygments.lexers import JavaLexer
 from pygments.lexers import CppLexer
 
@@ -127,6 +127,7 @@ class TextEditor(Widget):
     password = None
     codeinput = None
     currentFile = None
+    lex = PythonLexer()
 
     def on_text(instance, value):
         TextEditor.text = value
@@ -145,10 +146,24 @@ class TextEditor(Widget):
         navBar = NavBarController()
         navBarBtnsContainer = navBar.setup(self.nav_container)
 
-        TextEditor.codeinput = CodeInput(lexer=CythonLexer())
+        TextEditor.codeinput = CodeInput()
+        #TextEditor.choose_lexer()
+        #TextEditor.codeinput.lexer = TextEditor.lex
         TextEditor.codeinput.bind(text=TextEditor.on_text)
 
         self.text_container.add_widget(TextEditor.codeinput)
+
+    def choose_lexer(filename):
+        fs = FileSystem()
+        filetype = fs.getFileType(filename)
+        if filetype == 'py':
+            TextEditor.lex = PythonLexer()
+        elif filetype == 'java':
+            TextEditor.lex = JavaLexer()
+        elif filetype == 'cpp':
+            TextEditor.lex = CppLexer()
+        TextEditor.codeinput.lexer = TextEditor.lex
+
 
     def updateCodeInput(newstring):
         print(newstring)
@@ -528,6 +543,8 @@ class LoadSaveDialog(FloatLayout):
         file = open(filename[0], opt)
         LoadSaveDialog.string = file.read()
         file.close()
+
+        TextEditor.choose_lexer(LoadSaveDialog.file_to_load[0])
 
         print(path, filename)
         # ask the user for organisation name and password

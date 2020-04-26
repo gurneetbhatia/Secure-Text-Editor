@@ -36,12 +36,29 @@ import tkinter as tk
 class NavBarController:
     fileDropdown = DropDown()
     orgDropdown = DropDown()
+    runDropdown = DropDown()
 
     def setup(self, layout):
-        import_btn = Button(text='Organisation', font_size=14)
-        save_btn = Button(text='Run', font_size=14)
-        run_btn = Button(text='Help', font_size=14)
+        help_btn = Button(text='Help', font_size=14)
 
+        #File Drop down
+        self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=30)
+        self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=30)
+        self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=30)
+        self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=30)
+
+        self.createFile_btn.bind(on_press=TextEditor.create_btn_press)
+        self.import_btn.bind(on_press=TextEditor.import_file_btn_press)
+        self.loadFile_btn.bind(on_press=TextEditor.load_btn_press)
+        self.saveFile_btn.bind(on_press=TextEditor.save_btn_press)
+
+        file_btns = [self.createFile_btn, self.import_btn, self.loadFile_btn, self.saveFile_btn]
+
+        fileDropDownSetup = DropDownController()
+        self.fileButton = fileDropDownSetup.setup(NavBarController.fileDropdown, file_btns, "File")
+        self.fileButton.size_hint_y = 1
+
+        #Organisaition Dropdown
         self.createOrg_btn = Button(text='Create Org', font_size=14, size_hint_y=None, height=30)
         self.loadOrg_btn = Button(text='Load Org', font_size=14, size_hint_y=None, height=30)
         self.viewOrg_btn = Button(text='View Org', font_size=14, size_hint_y=None, height=30)
@@ -56,34 +73,32 @@ class NavBarController:
         self.orgButton = orgDropDownSetup.setup(NavBarController.orgDropdown, org_btns, "Organisation")
         self.orgButton.size_hint_y = 1
 
-        self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=44)
-        self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=44)
-        self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=44)
-        self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=44)
+        #Run Dropdown
+        self.runBasic_btn = Button(text='Run', font_size=14, size_hint_y=None, height=30)
+        self.runWidthArgs_btn = Button(text='Run Args', font_size=14, size_hint_y=None, height=30)
+        self.compile_btn = Button(text='Compiles', font_size=14, size_hint_y=None, height=30)
 
-        self.createFile_btn.bind(on_press=TextEditor.create_btn_press)
-        self.import_btn.bind(on_press=TextEditor.import_file_btn_press)
-        self.loadFile_btn.bind(on_press=TextEditor.load_btn_press)
-        self.saveFile_btn.bind(on_press=TextEditor.save_btn_press)
+        self.runBasic_btn.bind(on_press=TextEditor.runBasic_btn_press)
+        self.runWidthArgs_btn.bind(on_press=TextEditor.runWidthArgs_btn_press)
+        self.compile_btn.bind(on_press=TextEditor.compile_btn_press)
 
-        file_btns = [self.createFile_btn, self.import_btn, self.loadFile_btn, self.saveFile_btn]
+        run_btns = [self.runBasic_btn, self.runWidthArgs_btn, self.compile_btn]
 
-        fileDropDownSetup = DropDownController()
-        self.fileButton = fileDropDownSetup.setup(NavBarController.fileDropdown, file_btns, "File")
-        self.fileButton.size_hint_y = 1
-        btns = [import_btn, save_btn, run_btn]
+        runDropdownSetup = DropDownController()
+        self.runBtn = runDropdownSetup.setup(NavBarController.runDropdown, run_btns, "Run")
+        self.runBtn.size_hint_y = 1
 
         # layout.add_widget(self.org_btn)
-        btns = [import_btn, save_btn, run_btn, self.fileButton, self.orgButton]
+        btns = [self.fileButton, self.orgButton, self.runBtn, help_btn]
 
         for btn in btns:
             layout.add_widget(btn)
 
-        btns[0].bind(on_press=TextEditor.import_btn_press)
-        btns[1].bind(on_press=TextEditor.save_btn_press)
-        btns[2].bind(on_press=TextEditor.run_btn_press)
-        btns[3].bind(on_release=NavBarController.fileDropdown.open, on_press=NavBarController.printPressed)
-        btns[4].bind(on_release=NavBarController.orgDropdown.open, on_press=NavBarController.printPressed)
+        btns[0].bind(on_release=NavBarController.fileDropdown.open, on_press=NavBarController.printPressed)
+        btns[1].bind(on_release=NavBarController.orgDropdown.open, on_press=NavBarController.printPressed)
+        btns[2].bind(on_release=NavBarController.runDropdown.open, on_press=NavBarController.printPressed)
+        btns[3].bind(on_press=TextEditor.help_btn_press)
+
 
 
     def printPressed(a):
@@ -171,34 +186,33 @@ class TextEditor(Widget):
     def viewOrg_btn_press(instance):
         print("View Orgs")
 
-    def org_btn_press(instance):
-        print('File')
+    # RUN DROPDOWN EVENTS
+    def runBasic_btn_press(instance):
+        print("Basic Run")
+    def runWidthArgs_btn_press(instance):
+        print("Run Args")
+    def compile_btn_press(instance):
+        print("Compile")
 
-    def import_btn_press(instance):
-        print('import')
-        popup = PopupInput()
-        popup.setup()
-
-    def popupdismiss(instance):
-        print('here')
+    # HELP BTN PRESS
+    def help_btn_press(instance):
+        print("Help")
 
     def save_btn_press(instance):
-        print('Save')
-        fs = FileSystem()
-        fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
-        print(TextEditor.text)
+        pass
+        # print('Save')
+        # fs = FileSystem()
+        # fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
+        # print(TextEditor.text)
 
     def save(self):
-        print('Save')
-        fs = FileSystem()
-        fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
-        print(TextEditor.text)
+        pass
+        # print('Save')
+        # fs = FileSystem()
+        # fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
+        # print(TextEditor.text)
 
     def on_keyboard(self, window, key, scancode, codepoint, modifier):
-        #print("Any Key")
-        #print(modifier)
-        #print(key)
-        #print(codepoint)
         if 'ctrl' in modifier and codepoint == 's':
             print("Clicked")
             self.save()

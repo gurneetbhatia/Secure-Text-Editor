@@ -31,7 +31,8 @@ from kivy.uix.popup import Popup
 from filesystem import FileSystem
 import os
 
-import tkinter as tk
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.scrollview import ScrollView
 
 cache = {'organisation': None, 'password': None}
 
@@ -191,6 +192,8 @@ class TextEditor(Widget):
 
     def viewOrg_btn_press(instance):
         print("View Orgs")
+        popup = OrganisationsPopup()
+        popup.setup()
 
     # RUN DROPDOWN EVENTS
     def runBasic_btn_press(instance):
@@ -365,6 +368,30 @@ class RunArgsPopup(Widget):
                 content=layout, size_hint=(0.6, 0.6))
             popup.open()
             button.bind(on_press=popup.dismiss)
+
+class OrganisationsPopup(Widget):
+    popup = None
+
+    def setup(self):
+        fs = FileSystem()
+        organisations = fs.getOrganisationsList()
+
+        #layout = BoxLayout(orientation='vertical')
+        layout = GridLayout(cols=1, spacing=4)
+        layout.bind(minimum_height=layout.setter('height'))
+        button = Button(text='Close')
+
+        for organisation in organisations:
+            label = Label(text=organisation)
+            layout.add_widget(label)
+
+        layout.add_widget(button)
+        #root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
+        #root.add_widget(layout)
+        OrganisationsPopup.popup = Popup(title='Your Organisations',
+            content=layout, size_hint=(0.7, 0.7))
+        OrganisationsPopup.popup.open()
+        button.bind(on_press=OrganisationsPopup.popup.dismiss)
 
 
 

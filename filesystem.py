@@ -124,27 +124,37 @@ class FileSystem:
             os.remove(filename)
             os.remove('./a.out')
 
+    def getOrganisationsList(self):
+        out = []
+        with os.scandir(self.local_keys_path) as entries:
+            for entry in entries:
+                name = entry.name.split('.')
+                if name[1] == 'key':
+                    out.append(name[0])
+        return out
+
 
 
 if __name__ == '__main__':
     f = FileSystem()
-    #f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
-    #print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
-    #f.run('test.py.enc', 'Student Hack', 'test1234')
-    #f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
-    #'test1234')
-    #print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
-    #f.createFile('test1.py.enc', 'Student Hack', 'test1234')
-    #f.run('test1.py.enc', 'Student Hack', 'test1234')
-
-    #f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
-    #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
-    #f.run('Test.java.enc', 'Student Hack', 'test1234')
-
-    #f.importFile('test.cpp', 'Student Hack', 'test1234', 'test.cpp.enc')
-    #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
-    #f.run('test.cpp.enc', 'Student Hack', 'test1234')
-    f.importFile('args-test.py', 'Student Hack', 'test1234', 'args-test.py.enc')
-    print(f.readFile('args-test.py.enc', 'Student Hack', 'test1234'))
-    print('here')
-    f.run('args-test.py.enc', 'Student Hack', 'test1234', [1,2,3,4,5])
+    # f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
+    # print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
+    # f.run('test.py.enc', 'Student Hack', 'test1234')
+    # f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
+    # 'test1234')
+    # print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
+    # f.createFile('test1.py.enc', 'Student Hack', 'test1234')
+    # f.run('test1.py.enc', 'Student Hack', 'test1234')
+    #
+    # f.importFile('Test.java', 'Student Hack', 'test1234', 'Test.java.enc')
+    # print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
+    # f.run('Test.java.enc', 'Student Hack', 'test1234')
+    #
+    # f.importFile('test.cpp', 'Student Hack', 'test1234', 'test.cpp.enc')
+    # print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
+    # f.run('test.cpp.enc', 'Student Hack', 'test1234')
+    # f.importFile('args-test.py', 'Student Hack', 'test1234', 'args-test.py.enc')
+    # print(f.readFile('args-test.py.enc', 'Student Hack', 'test1234'))
+    # print('here')
+    # f.run('args-test.py.enc', 'Student Hack', 'test1234', [1,2,3,4,5])
+    print(f.getOrganisationsList())

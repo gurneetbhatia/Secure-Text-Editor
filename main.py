@@ -565,6 +565,7 @@ class LoadSaveDialog(FloatLayout):
         if (cache['organisation'] != None):
             fs = FileSystem()
             fs.createFile(filename, organisation, password, TextEditor.text)
+            TextEditor.currentFile = filename + '.enc'
         else:
             # the user needs to be prompted to login first
             popup_msg = "Please login to an organisation first!"

@@ -102,7 +102,7 @@ class FileSystem:
             exec(decrypted_contents)
         elif file_ext == 'java':
             elems = filepath.split('/')
-            dir = '/'.join(elems[:-1])
+            dir = '//'.join(elems[:-1])
             os.chdir(dir)
             filepath = elems[-1]
             # create a temporary file

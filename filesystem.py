@@ -128,9 +128,9 @@ class FileSystem:
 
 if __name__ == '__main__':
     f = FileSystem()
-    f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
+    #f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
     #print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
-    f.run('test.py.enc', 'Student Hack', 'test1234')
+    #f.run('test.py.enc', 'Student Hack', 'test1234')
     #f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
     #'test1234')
     #print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
@@ -144,3 +144,7 @@ if __name__ == '__main__':
     #f.importFile('test.cpp', 'Student Hack', 'test1234', 'test.cpp.enc')
     #print(f.readFile('Test.java.enc', 'Student Hack', 'test1234'))
     #f.run('test.cpp.enc', 'Student Hack', 'test1234')
+    f.importFile('args-test.py', 'Student Hack', 'test1234', 'args-test.py.enc')
+    print(f.readFile('args-test.py.enc', 'Student Hack', 'test1234'))
+    print('here')
+    f.run('args-test.py.enc', 'Student Hack', 'test1234', [1,2,3,4,5])

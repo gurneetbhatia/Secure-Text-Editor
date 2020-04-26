@@ -198,6 +198,11 @@ class TextEditor(Widget):
 
     def runWidthArgs_btn_press(instance):
         print("Run Args")
+        # need to show a popup to the user that allows them to enter args
+        if(TextEditor.currentFile != None):
+            popup = RunArgsPopup()
+            popup.setup()
+
     def compile_btn_press(instance):
         print("Compile")
 
@@ -215,6 +220,9 @@ class TextEditor(Widget):
         if(TextEditor.currentFile != None):
             fs = FileSystem()
             fs.updateFile(TextEditor.currentFile, TextEditor.text, cache['organisation'], cache['password'])
+        else:
+            lsd = LoadSaveDialog()
+            lsd.show_save()
         # print('Save')
         # fs = FileSystem()
         # fs.updateFile('finnsFile.enc', TextEditor.text, 'Student Hack', 'test1234')
@@ -304,6 +312,54 @@ class CreateOrgPopup(Widget):
             layout.add_widget(button)
             popup = Popup(title=popup_title,
                 content=layout, size_hint=(None, None), size=(400, 250))
+            popup.open()
+            button.bind(on_press=popup.dismiss)
+
+
+class RunArgsPopup(Widget):
+    org = ''
+    popup = None
+
+    def set_org(instance, value):
+        RunArgsPopup.org = value
+
+    def setup(self):
+        layout = BoxLayout(orientation='vertical')
+        labelOrg = Label(text='Arguments (space-separated)')
+        inputOrg = TextInput(multiline=False)
+        button = Button(text='Confirm')
+        layout.add_widget(labelOrg)
+        layout.add_widget(inputOrg)
+        layout.add_widget(button)
+        inputOrg.bind(text=RunArgsPopup.set_org)
+        RunArgsPopup.popup = Popup(title='Arguments to run file',
+            content=layout, size_hint=(None, None), size=(400, 250))
+        RunArgsPopup.popup.open()
+        button.bind(on_press=self.confirm_clicked)
+
+    def confirm_clicked(self, x):
+        RunArgsPopup.popup.dismiss()
+        organisation = cache['organisation']
+        password = cache['organisation']
+        filename = TextEditor.currentFile
+        args = RunArgsPopup.org.split(' ')
+        if (organisation != None and password != None and filename != None):
+            fs = FileSystem()
+            print("File: "+TextEditor.currentFile)
+            fs.run(filename, organisation, password, args)
+        else:
+            # the user needs to be prompted to login first/load a file
+            popup_msg = "Please login to an organisation and load a file!"
+            layout = BoxLayout(orientation='vertical')
+            popup_title = "Error"
+            label1 = Label(text=popup_title)
+            label = Label(text=popup_msg)
+            button = Button(text='Dismiss')
+            layout.add_widget(label1)
+            layout.add_widget(label)
+            layout.add_widget(button)
+            popup = Popup(title=popup_title,
+                content=layout, size_hint=(0.6, 0.6))
             popup.open()
             button.bind(on_press=popup.dismiss)
 
@@ -455,7 +511,7 @@ class LoadSaveDialog(FloatLayout):
             if ext != 'enc':
                 # the file needs to be encrypted first
                 print('here3')
-                fs.createFile(filename[0], organisation, password)
+                fs.updateFile(filename[0]+'.enc', LoadSaveDialog.string, organisation, password)
                 TextEditor.updateCodeInput(LoadSaveDialog.string)
                 TextEditor.currentFile = filename[0]+'.enc'
             else:

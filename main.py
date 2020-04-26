@@ -435,8 +435,13 @@ class LoadSaveDialog(FloatLayout):
 
     def load(self, path, filename):
         LoadSaveDialog.file_to_load = filename
-        with open(os.path.join(path, filename[0])) as stream:
-            LoadSaveDialog.string= stream.read()
+        #with open(os.path.join(path, filename[0])) as stream:
+            #LoadSaveDialog.string= stream.read()
+        ext = filename[0].split('.')[-1]
+        opt = 'rb' if ext == 'enc' else 'r'
+        file = open(filename[0], opt)
+        LoadSaveDialog.string = file.read()
+        file.close()
 
         print(path, filename)
         # ask the user for organisation name and password
@@ -456,8 +461,8 @@ class LoadSaveDialog(FloatLayout):
                 print(TextEditor.codeinput.text)
                 print(LoadSaveDialog.string)
             else:
-                print(fs.readFile(filename, organisation, password))
-                TextEditor.codeinput.text = fs.readFile(filename, organisation, password)
+                print(fs.readFile(filename[0], organisation, password))
+                TextEditor.codeinput.text = fs.readFile(filename[0], organisation, password)
         else:
             # the user needs to be prompted to login first
             popup_msg = "Please login to an organisation first!"

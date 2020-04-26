@@ -45,16 +45,14 @@ class NavBarController:
 
         #File Drop down
         self.createFile_btn = Button(text='Create', font_size=14, size_hint_y=None, height=30)
-        self.import_btn = Button(text='Import', font_size=14, size_hint_y=None, height=30)
         self.loadFile_btn = Button(text='Load', font_size=14, size_hint_y=None, height=30)
         self.saveFile_btn = Button(text='Save', font_size=14, size_hint_y=None, height=30)
 
         self.createFile_btn.bind(on_press=TextEditor.create_btn_press)
-        self.import_btn.bind(on_press=TextEditor.import_file_btn_press)
         self.loadFile_btn.bind(on_press=TextEditor.load_btn_press)
         self.saveFile_btn.bind(on_press=TextEditor.save_btn_press)
 
-        file_btns = [self.createFile_btn, self.import_btn, self.loadFile_btn, self.saveFile_btn]
+        file_btns = [self.createFile_btn, self.loadFile_btn, self.saveFile_btn]
 
         fileDropDownSetup = DropDownController()
         self.fileButton = fileDropDownSetup.setup(NavBarController.fileDropdown, file_btns, "File")
@@ -169,13 +167,10 @@ class TextEditor(Widget):
     def create_btn_press(instance):
         print("Create")
 
-    def import_file_btn_press(instance):
-        print('import file')
-        lsd = LoadSaveDialog()
-        lsd.show_load()
-
     def load_btn_press(instance):
         print("Load")
+        lsd = LoadSaveDialog()
+        lsd.show_load()
 
     def save_btn_press(instance):
         print("Save")
@@ -461,8 +456,24 @@ class LoadSaveDialog(FloatLayout):
                 print(TextEditor.codeinput.text)
                 print(LoadSaveDialog.string)
             else:
-                print(fs.readFile(filename[0], organisation, password))
-                TextEditor.codeinput.text = fs.readFile(filename[0], organisation, password)
+                try:
+                    print(fs.readFile(filename[0], organisation, password))
+                    TextEditor.codeinput.text = fs.readFile(filename[0], organisation, password)
+                except ValueError:
+                    # decryption failed
+                    popup_msg = "Credentials invalid for the selected file!"
+                    layout = BoxLayout(orientation='vertical')
+                    popup_title = "Error"
+                    label1 = Label(text=popup_title)
+                    label = Label(text=popup_msg)
+                    button = Button(text='Dismiss')
+                    layout.add_widget(label1)
+                    layout.add_widget(label)
+                    layout.add_widget(button)
+                    popup = Popup(title=popup_title,
+                        content=layout, size_hint=(0.6, 0.6))
+                    popup.open()
+                    button.bind(on_press=popup.dismiss)
         else:
             # the user needs to be prompted to login first
             popup_msg = "Please login to an organisation first!"

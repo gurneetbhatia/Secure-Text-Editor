@@ -188,6 +188,9 @@ class TextEditor(Widget):
 
     def loadOrg_btn_press(instance):
         print("Load Org")
+        popup = PopupInput()
+        popup.setup()
+
     def viewOrg_btn_press(instance):
         print("View Orgs")
 
@@ -357,6 +360,8 @@ class PopupInput(Widget):
         try:
             fs.getOrganisationKey(organisation, password)
             popup_msg = "Logged in to: "+organisation
+            cache['organisation'] = organisation
+            cache['password'] = password
             err = False
         except FileNotFoundError:
             # the organisation does not exis
@@ -437,6 +442,8 @@ class LoadSaveDialog(FloatLayout):
         # ask the user for organisation name and password
         if (cache['organisation'] != None):
             # the user is logged in to an org
+            organisation = cache['organisation']
+            password = cache['password']
             if ext != 'enc':
                 # the file needs to be encrypted first
                 print('here3')

@@ -128,10 +128,10 @@ class FileSystem:
 
 if __name__ == '__main__':
     f = FileSystem()
-    f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
+    #f.importFile('test.py', 'Student Hack', 'test1234', 'test.py.enc')
     print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
-    f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
-    'test1234')
+    #f.updateFile('test.py.enc', 'print("hello world 1")', 'Student Hack',
+    #'test1234')
     print(f.readFile('test.py.enc', 'Student Hack', 'test1234'))
     f.createFile('test1.py.enc', 'Student Hack', 'test1234')
     f.run('test1.py.enc', 'Student Hack', 'test1234')

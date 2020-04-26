@@ -457,6 +457,7 @@ class LoadSaveDialog(FloatLayout):
                 try:
                     print(fs.readFile(filename[0], organisation, password))
                     TextEditor.codeinput.text = fs.readFile(filename[0], organisation, password)
+                    TextEditor.currentFile = filename[0]
                 except ValueError:
                     # decryption failed
                     popup_msg = "Credentials invalid for the selected file!"
